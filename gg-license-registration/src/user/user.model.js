@@ -5,11 +5,11 @@ const userSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
-  metrics_endpoint: {
+  metrics_host: {
     type: String,
     required: true,
+    unique: true,
   },
   organization: {
     type: String,

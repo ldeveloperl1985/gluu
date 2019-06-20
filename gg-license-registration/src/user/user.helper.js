@@ -49,17 +49,17 @@ let getUserById = (id) => {
  */
 let registration = (req, id) => {
   return user
-    .findOne({ email: req.email })
+    .findOne({ metrics_host: req.metrics_host })
     .exec()
     .then((oUser) => {
       if (oUser) {
         oUser.email = req.email || oUser.email;
-        oUser.metrics_endpoint = req.metrics_endpoint || oUser.metrics_endpoint;
+        oUser.metrics_host = req.metrics_host || oUser.metrics_host;
         oUser.organization = req.organization || oUser.organization;
       } else {
         oUser = new user();
         oUser.email = req.email;
-        oUser.metrics_endpoint = req.metrics_endpoint;
+        oUser.metrics_host = req.metrics_host;
         oUser.organization = req.organization;
       }
 
@@ -79,7 +79,7 @@ let registration = (req, id) => {
 let addUser = (req) => {
   let oUser = new user();
   oUser.email = req.email;
-  oUser.metrics_endpoint = req.metrics_endpoint;
+  oUser.metrics_host = req.metrics_host;
   oUser.organization = req.organization;
 
   return oUser.save()
@@ -99,7 +99,7 @@ let updateUser = (req, id) => {
     .exec()
     .then((oUser) => {
       oUser.email = req.email || oUser.email;
-      oUser.metrics_endpoint = req.metrics_endpoint || oUser.metrics_endpoint;
+      oUser.metrics_host = req.metrics_host || oUser.metrics_host;
       oUser.organization = req.organization || oUser.organization;
 
       return oUser.save()

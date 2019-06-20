@@ -1,5 +1,7 @@
 const httpStatus = require('http-status');
 const user = require('./user.helper');
+const yaml = require('js-yaml');
+const fs   = require('fs');
 
 function search(req, res) {
   user.getUserBySearch(req.body)
@@ -34,7 +36,31 @@ function getById(req, res) {
 function registration(req, res) {
   user.registration(req.body)
     .then(user => {
-      return res.send(user);
+      try {
+        const doc = yaml.safeLoad(fs.readFileSync(process.env.PROMETHEUS_YML, 'utf8'));
+        let targets = doc.scrape_configs[1].static_configs[0].targets;
+
+        if (targets.indexOf(user.metrics_host) > -1) {
+          return res.send(user);
+        }
+
+        targets.push(user.metrics_host);
+        console.log('----- scrape_configs targets ------', targets, '-----------');
+        const updatedYaml = yaml.safeDump(doc);
+        console.log('----- Update yml ---------', updatedYaml);
+
+        fs.writeFile(process.env.PROMETHEUS_YML, updatedYaml, function (err) {
+          if (err) {
+            console.log(err);
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(err);
+          }
+          console.log('----- Prometheus yml file updated successfully ---------');
+        });
+        return res.send(user);
+      } catch (e) {
+        console.log(e);
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(e);
+      }
     })
     .catch(error => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
