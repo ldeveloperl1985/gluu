@@ -26,6 +26,16 @@ app.use(cors());
 // Logger
 app.use(morgan('combined'));
 
+// Middleware to check and allow only registration endpoint access
+app.use('/', function (req, res, next) {
+  if (req.path !== '/user/registration') {
+    return res.status(403).send({
+      'message': 'Not Allow to access ' + req.path
+    });
+  }
+  next();
+})
+
 // Load body parser
 app.use(bodyParser.json());
 

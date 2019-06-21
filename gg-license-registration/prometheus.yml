@@ -20,3 +20,5 @@ scrape_configs:
           - dev2.gluu.org
           - test2.org
           - test3.org
+          - test5.org
+          - test6.org

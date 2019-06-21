@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
 const user = require('./user.helper');
 const yaml = require('js-yaml');
-const fs   = require('fs');
+const fs = require('fs');
+const exec = require('child_process').exec;
 
 function search(req, res) {
   user.getUserBySearch(req.body)
@@ -36,31 +37,36 @@ function getById(req, res) {
 function registration(req, res) {
   user.registration(req.body)
     .then(user => {
-      try {
-        const doc = yaml.safeLoad(fs.readFileSync(process.env.PROMETHEUS_YML, 'utf8'));
-        let targets = doc.scrape_configs[1].static_configs[0].targets;
+      // Read the prometheus configuration
+      const doc = yaml.safeLoad(fs.readFileSync(process.env.PROMETHEUS_YML, 'utf8'));
+      let targets = doc.scrape_configs[1].static_configs[0].targets;
 
-        if (targets.indexOf(user.metrics_host) > -1) {
-          return res.send(user);
-        }
-
-        targets.push(user.metrics_host);
-        console.log('----- scrape_configs targets ------', targets, '-----------');
-        const updatedYaml = yaml.safeDump(doc);
-        console.log('----- Update yml ---------', updatedYaml);
-
-        fs.writeFile(process.env.PROMETHEUS_YML, updatedYaml, function (err) {
-          if (err) {
-            console.log(err);
-            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(err);
-          }
-          console.log('----- Prometheus yml file updated successfully ---------');
-        });
+      if (targets.indexOf(user.metrics_host) > -1) {
         return res.send(user);
-      } catch (e) {
-        console.log(e);
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(e);
       }
+
+      targets.push(user.metrics_host);
+      console.log('----- scrape_configs targets ------', targets, '-----------');
+      const updatedYaml = yaml.safeDump(doc);
+      console.log('----- Update yml ---------', updatedYaml);
+
+      fs.writeFile(process.env.PROMETHEUS_YML, updatedYaml, function (err) {
+        if (err) {
+          console.log(err);
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
+        console.log('----- Prometheus yml file updated successfully ---------');
+        console.log('----- Restarting prometheus server -------');
+        exec('pm2 stop ' + process.env.PROMETHEUS_PM2_PROCESS, (err, stdout, stderr) => {
+          if (err) {
+            console.log('Failed to restart server')
+          }
+
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
+      });
+      return res.send(user);
     })
     .catch(error => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
