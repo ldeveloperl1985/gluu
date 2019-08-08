@@ -22,3 +22,8 @@ scrape_configs:
           - test3.org
           - test5.org
           - test6.org
+          - test7.org
+          - test.org
+          - test8.org
+          - test1.org
+          - test9.org
