@@ -120,3 +120,26 @@ if [ "$CHECK_STATUS" != "200" ]; then
     exit 1
 fi
 
+############################################ Second time post calling
+curl -X GET http://$KONG_PROXY_HOST:8000/posts/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+curl -X GET http://$KONG_PROXY_HOST:8000/posts/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+curl -X GET http://$KONG_PROXY_HOST:8000/posts/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+
+CHECK_STATUS=`curl -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com' --write-out "%{http_code}\n" --silent --output /dev/null http://$KONG_PROXY_HOST:8000/posts/1`
+
+if [ "$CHECK_STATUS" != "200" ]; then
+    echo "UMA PEP security fail for path /posts/1 second time"
+    exit 1
+fi
+
+################################################## Seconf time comment calling
+curl -X GET http://$KONG_PROXY_HOST:8000/comments/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+curl -X GET http://$KONG_PROXY_HOST:8000/comments/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+curl -X GET http://$KONG_PROXY_HOST:8000/comments/1 -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com'
+
+CHECK_STATUS=`curl -H "Authorization: Bearer $RPT_TOKEN"  -H 'Host: jsonplaceholder2.typicode.com' --write-out "%{http_code}\n" --silent --output /dev/null http://$KONG_PROXY_HOST:8000/comments/1`
+
+if [ "$CHECK_STATUS" != "200" ]; then
+    echo "UMA PEP security fail for path /comments/1 second time"
+    exit 1
+fi
