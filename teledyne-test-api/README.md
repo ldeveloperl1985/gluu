@@ -29,3 +29,6 @@ It will start node js server on port `3000`
 There are `posts` api available with dummy data.
 
 Request `GET http://localhost:3000/posts` to get all posts and `GET http://localhost:3000/posts/[id]` to get one record.  
+
+``
+``
