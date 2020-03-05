@@ -9,6 +9,7 @@
   "author": "Meghna Joshi",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "scim-node": "^2.1.2"
   }
 }
