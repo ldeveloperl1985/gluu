@@ -1,0 +1,190 @@
+# raw swagger spec link:
+# https://docs.konghq.com/enterprise/1.5.x/brain-immunity/auto-generated-specs/#retrieve-openapiswagger-specifications-from-the-collector-backend
+# https://discuss.konghq.com/t/import-swagger-open-api-document-to-create-api-in-kong/510/13
+# https://raw.githubusercontent.com/GluuFederation/oxd/version_4.0/oxd-server/src/main/resources/swagger.yaml
+# https://gluu.org/swagger-ui/?url=https://raw.githubusercontent.com/GluuFederation/oxd/version_4.0/oxd-server/src/main/resources/swagger.yaml#/kong/setup-client
+openapi: 3.0.1
+info:
+  title: Gluu-Gateway
+  description: Swagger config for setup Gluu Gateway plugins and OP Clients
+  contact:
+    email: meg@gluu.org
+  license:
+    name: License
+    url: https://github.com/GluuFederation/gluu-gateway/blob/master/license.md
+  version: "4.2"
+servers:
+- url: https://localhost:8001
+- url: https://localhost:8443
+tags:
+- name: kong
+  description: services, routes, consumer and plugin configuration
+paths:
+  /:
+    get:
+      tags:
+      - kong
+      summary: Kong Configuration
+      description: This endpoint returns the kong configuration which is in kong.conf
+      operationId: kong-configuration
+      responses:
+        200:
+          description: OK
+          content: {}
+  /services:
+    post:
+      tags:
+      - kong
+      summary: Configure the Kong Service
+      description: It use to add your upstream service into Kong.
+      operationId: services
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: PostKongService
+              required:
+              - name
+              - url
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: test-service
+                  description: The name of the service
+                url:
+                  type: string
+                  example: http://localhost:4000
+                  description: Upstream URL
+        required: false
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: PostKongService
+                required:
+                - name
+                type: object
+                properties:
+                  name:
+                    type: string
+        400:
+          description: Invalid parameters are provided to endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    oxd_id:
+      type: string
+      example: bcad760f-91ba-46e1-a020-05e4281d91b6
+    Condition:
+      required:
+      - httpMethods
+      - scope_expression
+      - scopes
+      - ticketScopes
+      type: object
+      properties:
+        httpMethods:
+          type: array
+          items:
+            type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        scope_expression:
+          type: array
+          items:
+            type: string
+        ticketScopes:
+          type: array
+          items:
+            type: string
+    RsResource:
+      required:
+      - conditions
+      - path
+      type: object
+      properties:
+        path:
+          type: string
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+        exp:
+          type: integer
+          description: Resource expiration date in terms of number of seconds
+           since January 1 1970 UTC
+          format: int64
+          example: 1545709072
+        iat:
+          type: integer
+          description: Resource creation date in terms of number of seconds
+            since January 1 1970 UTC
+          format: int64
+          example: 1535709072
+    JsonWebKey:
+      required:
+      - alg
+      - exp
+      - key_ops
+      - kid
+      - kty
+      - use
+      - x5c
+      - x5t
+      - x5u
+      type: object
+      properties:
+        kid:
+          type: string
+        kty:
+          type: string
+        use:
+          type: string
+        alg:
+          type: string
+        crv:
+          type: string
+        exp:
+          type: integer
+          format: int64
+          example: 1563964950485
+        x5c:
+          type: array
+          items:
+            type: string
+        n:
+          type: string
+        e:
+          type: string
+        x:
+          type: string
+        y:
+          type: string
+    ErrorResponse:
+      required:
+      - body
+      - headers
+      - request
+      type: object
+      properties:
+        body:
+          type: object
+          properties:
+            message:
+              type: string
+            name: 
+              type: string
+        headers:
+          type: object
+        request:
+          type: object
+        statusCode: 
+          type: number
