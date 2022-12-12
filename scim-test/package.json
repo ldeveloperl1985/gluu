@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@chilkat/ck-node11-linux64": "^9.50.82",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "scim-node": "^2.1.2"
   }
 }
